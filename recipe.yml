@@ -38,6 +38,21 @@ stages:
     - curl -fsSL https://pkgs.tailscale.com/stable/debian/sid.tailscale-keyring.list | tee /etc/apt/sources.list.d/tailscale.list
     - apt-get update && apt-get install -y tailscale
 
+  - name: ghostty
+    type: shell
+    commands:
+    - apt-get install -y libgtk-4-dev libadwaita-1-dev git gcc-multilib
+    - wget https://ziglang.org/download/0.13.0/zig-linux-x86_64-0.13.0.tar.xz
+    - tar xf zig-linux-x86_64-0.13.0.tar.xz
+    - git clone https://github.com/ghostty-org/ghostty
+    - cd ghostty
+    - "git checkout \"$(git describe --abbrev=0 --match='v*')\""
+    - ../zig-linux-x86_64-0.13.0/zig build -Doptimize=ReleaseFast
+    - mv zig-out/bin/* /bin
+    - cd ..
+    - rm -rf ghostty
+    - rm -rf zig-linux-x86_64-0.13.0
+
   - name: example-commands # Sample module demonstrating the Shell module with custom commands
     type: shell
     commands:

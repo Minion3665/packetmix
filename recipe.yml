@@ -29,6 +29,20 @@ stages:
       packages:
       - vim
 
+  - name: docker # Install docker to allow running, e.g., nextcloud-docker-dev, which does not support podman
+    type: shell
+    commands:
+    - apt-get update
+    - apt-get install -y ca-certificates curl
+    - install -m 0755 -d /etc/apt/keyrings
+    - curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
+    - chmod a+r /etc/apt/keyrings/docker.asc
+    - echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian bookworm stable" > /etc/apt/sources.list.d/docker.list
+    #                                                                                       Not sid, as bookworm is latest provided ^^
+    - apt-get update
+    - apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    - groupadd -f docker # controls permissions for running docker ... and dockerd cannot start without it!
+
   - name: tailscale # Install Tailscale
     # Based on GitHub user RickBrewer's tailscale install section
     type: shell
